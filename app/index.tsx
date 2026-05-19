@@ -7,16 +7,19 @@ import Body from "../components/Body";
 import BottomNav from "../components/BottomNav";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SymbioticUI from "@/symbiotic/SymbioticUI";
+import { removeRuntimeFields } from "@/symbiotic/utils";
 
 export default function Index() {
   return (
     <SymbioticUI
       ai={(tree) => {
-        console.log(JSON.stringify(tree, null, 2));
+        const serializableTree = removeRuntimeFields(tree);
+
+        console.log(JSON.stringify(serializableTree, null, 2));
       }}
     >
-      <SafeAreaView className="flex-1 bg-black">
-        <View className="flex-1 bg-black flex-col">
+      <SafeAreaView sym-id="Parent" className="flex-1 bg-black">
+        <View sym-id="Container" className="flex-1 bg-black flex-col">
           <Header sym-id="Header" />
 
           <Body sym-id="Body" />

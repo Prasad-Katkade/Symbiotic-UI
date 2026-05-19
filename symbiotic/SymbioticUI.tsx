@@ -1,4 +1,7 @@
-import React, { useMemo } from "react";
+import React, {
+  useMemo,
+  useState,
+} from "react";
 
 import {
   Pressable,
@@ -6,17 +9,24 @@ import {
 
 import { parseChildren } from "./parser";
 
+import { renderTree } from "./renderer";
+
+import {
+  applyMutation,
+} from "./mutations";
+
 type Props = {
   children: React.ReactNode;
 
-  ai?: (tree: any) => void;
+  ai?: (tree: any) => any;
 };
 
 export default function SymbioticUI({
   children,
   ai,
 }: Props) {
-  const tree = useMemo(() => {
+
+  const initialTree = useMemo(() => {
     return {
       id: "root",
       type: "SymbioticUI",
@@ -24,8 +34,33 @@ export default function SymbioticUI({
     };
   }, [children]);
 
+  const [tree, setTree] =
+    useState(initialTree);
+
   const handleLongPress = () => {
-    ai?.(tree);
+
+  
+
+    const mutation = {
+      type: "REORDER",
+      target: "Container",
+
+      order: [
+        "BottomNav",
+        "Body",
+        "Header",
+      ],
+    } as const;
+
+    const updatedTree =
+      applyMutation(
+        tree,
+        mutation
+      );
+
+    setTree(updatedTree);
+
+    ai?.(updatedTree);
   };
 
   return (
@@ -33,7 +68,7 @@ export default function SymbioticUI({
       style={{ flex: 1 }}
       onLongPress={handleLongPress}
     >
-      {children}
+      {renderTree(tree.children)}
     </Pressable>
   );
 }
