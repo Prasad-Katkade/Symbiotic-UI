@@ -1,0 +1,236 @@
+📄 SymbioticUI — Project Context (MVP)
+🧠 What We Are Building
+
+SymbioticUI is an AI-native UI runtime layer for React Native (Expo + TypeScript) that allows:
+
+runtime UI personalization
+AI-driven layout mutations
+long-press interaction editing
+limited styling changes (Tailwind / NativeWind)
+reorder / hide / show UI elements
+
+Instead of treating JSX as source of truth, we convert UI into a:
+
+SymTree (JSON-based UI graph)
+
+and mutate it dynamically using AI-generated structured actions.
+
+🏗 Core Architecture
+JSX (React Native Components)
+        ↓
+Parser (convert JSX → SymTree)
+        ↓
+SymTree (single source of truth)
+        ↓
+Mutation Engine (AI or manual)
+        ↓
+Updated SymTree
+        ↓
+Renderer (SymTree → JSX)
+        ↓
+React Native UI
+
+📦 Folder Structure
+symbiotic/
+│
+├── SymbioticUI.tsx
+├── parser.ts
+├── renderer.tsx
+├── mutations.ts
+├── registry.ts
+├── types.ts
+├── utils.ts
+📁 File Responsibilities
+1. SymbioticUI.tsx
+Purpose:
+
+Main wrapper controller for Symbiotic system.
+
+Responsibilities:
+parses JSX → SymTree
+stores SymTree in state
+handles long press events
+calls AI layer (optional)
+applies mutations
+triggers re-render
+
+Important Rules:
+DO NOT wrap ScrollView / FlatList here
+Only wrap static / layout-safe components
+MUST maintain SymTree as state
+
+2. parser.ts
+Purpose:
+
+Converts JSX into SymTree JSON.
+
+Output Structure:
+type SymNode = {
+  id: string;
+  type: string;
+  props: Record<string, any>;
+  children: SymNode[];
+};
+Responsibilities:
+extract sym-id
+flatten React children tree
+assign stable IDs
+remove runtime React references
+3. renderer.tsx
+Purpose:
+
+Converts SymTree → React Native UI
+
+Responsibilities:
+reads SymTree only
+maps node.type → actual component via registry
+renders recursively
+applies props
+Important Rule:
+
+❌ NEVER use original React elements
+✔ Always rebuild from SymTree
+
+4. registry.ts
+Purpose:
+
+Maps string type → React component
+
+export const registry = {
+  View,
+  SafeAreaView,
+  Header,
+  Body,
+  BottomNav,
+  Button,
+};
+Why needed:
+avoids JSX dependency
+enables dynamic rendering
+supports AI-generated UI types
+5. mutations.ts
+Purpose:
+
+Applies structured AI actions to SymTree
+
+Supported operations:
+REORDER
+HIDE
+SHOW
+CLASS_UPDATE (tailwind only)
+Example:
+{
+  "type": "REORDER",
+  "target": "Container",
+  "order": ["BottomNav", "Body", "Header"]
+}
+6. types.ts
+Purpose:
+
+Core SymTree type definitions
+
+export type SymNode = {
+  id: string;
+  type: string;
+  props?: {
+    className?: string;
+    text?: string;
+  };
+  children?: SymNode[];
+};
+7. utils.ts
+Purpose:
+
+Helper utilities
+
+Includes:
+serializeTree (remove internal fields)
+deep clone helpers
+safe JSON export for AI
+⚙️ Interaction System
+Long Press Flow
+User long presses UI element
+        ↓
+SymbioticUI intercepts event
+        ↓
+Find SymNode via sym-id
+        ↓
+Send node + tree to AI (optional)
+        ↓
+Receive mutation JSON
+        ↓
+applyMutation()
+        ↓
+setTree(updatedTree)
+        ↓
+UI re-renders
+📱 Important React Native Constraint (VERY IMPORTANT)
+DO NOT wrap:
+ScrollView
+FlatList
+VirtualizedList
+WHY:
+
+They break:
+
+scrolling
+gesture responder system
+layout measurement
+✅ Safe Wrapping Strategy
+
+SymbioticUI should only wrap:
+
+✔ static layouts
+✔ button groups
+✔ nav bars
+✔ cards
+✔ headers
+
+❌ Avoid Wrapping
+
+❌ Scroll containers
+❌ Gesture-heavy components
+❌ Performance-sensitive lists
+
+🧠 Key Design Decision
+SymbioticUI is NOT a wrapper of everything.
+
+It is a:
+
+Selective UI Mutation Layer
+🔥 Current MVP Capabilities
+
+✔ JSX → SymTree parsing
+✔ Stable IDs via sym-id
+✔ Long press detection
+✔ Mutation system (reorder working)
+✔ Renderer from SymTree
+✔ AI hook placeholder
+✔ Safe RN rendering model
+
+🚧 Current Limitations
+no diff-based updates (full re-render)
+no animation layer yet
+no persistent storage
+no scoped editing UI
+no visual selection overlay
+registry must be manually maintained
+🚀 Next Milestones (Recommended)
+Phase 2
+scoped editing (per component)
+highlight selected node
+visual edit mode
+Phase 3
+AI prompt modal UI
+structured prompt → mutation parser
+Phase 4
+animations (Reanimated layout transitions)
+Phase 5
+persistence (AsyncStorage / backend sync)
+undo/redo system
+🧠 Core Philosophy
+
+React is the renderer
+SymTree is the brain
+AI is the mutation engine
+User gestures are the input system
