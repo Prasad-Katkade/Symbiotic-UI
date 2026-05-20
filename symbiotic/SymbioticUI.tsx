@@ -6,9 +6,17 @@ import { SymbioticRenderer } from './renderer';
 // 1. The Global Context
 const SymbioticContext = createContext<SymbioticContextType | null>(null);
 
+const STORAGE_KEY_CURRENT = '@symbiotic_current_registry';
+const STORAGE_KEY_INITIAL = '@symbiotic_initial_registry';
+
 export const SymbioticProvider = ({ children }: { children: ReactNode }) => {
   const [registry, setRegistry] = useState<SymRegistry>({});
   const initialRegistryRef = useRef<SymRegistry>({});
+
+  const latestRegistryRef = useRef<SymRegistry>(registry);
+  latestRegistryRef.current = registry;
+
+  const getRegistry = () => latestRegistryRef.current;
 
   const registerTree = (symName: string, tree: SymTree) => {
     setRegistry(prev => {
@@ -18,10 +26,20 @@ export const SymbioticProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  const updateRegistry = (symName: string) => {
-    console.log(`\n=== CURRENT REGISTRY STATE ===`);
-    console.log(JSON.stringify(registry, null, 2));
-    console.log(`==============================\n`);
+ const updateRegistry = (symName: string, mutatedTree?: SymTree) => {
+    if (mutatedTree) {
+      // Apply the LLM's new JSON to trigger a re-render
+      setRegistry(prev => ({
+        ...prev,
+        [symName]: mutatedTree
+      }));
+      console.log(`[Symbiotic] Mutation applied to ${symName}!`);
+    } else {
+      // Fallback: Just log it if no tree is passed
+      console.log(`\n=== No Trees Passed - Current State ===`);
+      console.log(JSON.stringify(registry, null, 2));
+      console.log(`==============================\n`);
+    }
   };
 
   const resetRegistry = (symName: string) => {
@@ -34,7 +52,7 @@ export const SymbioticProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <SymbioticContext.Provider value={{ registry, updateRegistry, resetRegistry, registerTree }}>
+    <SymbioticContext.Provider value={{ registry, updateRegistry, resetRegistry, registerTree, getRegistry }}>
       {children}
     </SymbioticContext.Provider>
   );

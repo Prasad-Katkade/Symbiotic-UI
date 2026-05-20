@@ -3,7 +3,27 @@ import { House, Search, Heart, User } from "lucide-react-native";
 import {SymbioticUI, useSymbiotic} from "@/symbiotic/SymbioticUI";
 
 export default function BottomNav() {
-  const { updateRegistry } = useSymbiotic();
+  const { getRegistry, updateRegistry } = useSymbiotic();
+
+
+  const mockLLMMutation = () => {
+    // 1. Fetch the absolute latest registry from memory
+    const liveRegistry = getRegistry();
+    console.log("current registry for bottomNav", liveRegistry['bottomNav']);
+    
+    const currentTree = liveRegistry['bottomNav'];
+    if (!currentTree) return;
+
+    // 2. Create a deep copy
+    const mutatedTree = JSON.parse(JSON.stringify(currentTree));
+
+    // 3. The LLM changes the layout order
+    mutatedTree.nodes['container'].children = ['search', 'profile', 'fav', 'home'];
+
+    // 4. Update the state engine
+    updateRegistry('bottomNav', mutatedTree);
+  };
+
   return (
   <SymbioticUI sym-name="bottomNav">
     <View
@@ -31,7 +51,7 @@ export default function BottomNav() {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity sym-id="profile" className="items-center" onPress={()=>{updateRegistry('bottomNav');updateRegistry('app');}}>
+      <TouchableOpacity sym-id="profile" className="items-center" onPress={()=>{mockLLMMutation()}}>
         <User sym-id="profileic" color="white" size={22} />
         <Text sym-id="profiletxt" className="text-white text-xs mt-1">
           Profile

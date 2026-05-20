@@ -22,7 +22,8 @@ export type SymRegistry = Record<string, SymTree>;
 
 export interface SymbioticContextType {
   registry: SymRegistry;
-  updateRegistry: (symName: string) => void; // Modified for Step 4 testing
+  getRegistry: () => SymRegistry; // NEW
+  updateRegistry: (symName: string, mutatedTree?: SymTree) => void; // Modified for Step 4 testing
   resetRegistry: (symName: string) => void;
   registerTree: (symName: string, tree: SymTree) => void;
 }
