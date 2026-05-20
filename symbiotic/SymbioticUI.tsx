@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
 import { SymRegistry, SymbioticContextType, SymTree } from './types';
 import { parseJSXToRegistry } from './parser';
+import { SymbioticRenderer } from './renderer';
 
 // 1. The Global Context
 const SymbioticContext = createContext<SymbioticContextType | null>(null);
@@ -52,7 +53,7 @@ interface SymbioticUIProps {
 }
 
 export const SymbioticUI = ({ 'sym-name': symName, children }: SymbioticUIProps) => {
-  const { registerTree } = useSymbiotic();
+  const { registry, registerTree } = useSymbiotic();
   const hasParsed = useRef(false);
 
   useEffect(() => {
@@ -61,9 +62,13 @@ export const SymbioticUI = ({ 'sym-name': symName, children }: SymbioticUIProps)
       registerTree(symName, parsedTree);
       hasParsed.current = true;
     }
-  }, [children, symName]);
+  }, []); // Remove dependencies so it only parses strictly on mount
 
-  // For phase 1, we just render original children. 
-  // In phase 2, we will replace this with the Renderer component.
-  return <>{children}</>;
+  const tree = registry[symName];
+
+  // If tree doesn't exist yet (first tick), render null to avoid flashing.
+  // Once it exists in state, render it from the JSON.
+  if (!tree) return null;
+
+  return <SymbioticRenderer symName={symName} tree={tree} />;
 };

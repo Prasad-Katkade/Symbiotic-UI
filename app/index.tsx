@@ -18,7 +18,7 @@ export default function Index() {
 
           <Body sym-id="Body" />
 
-          <BottomNav />
+          <BottomNav sym-id="BottomNavcomp"  />
         </View></SymbioticUI>
       </SafeAreaView>
     </SymbioticProvider>

@@ -11,8 +11,8 @@ export default function BottomNav() {
       className="flex-row justify-around items-center bg-zinc-900 border-t border-zinc-800 py-3"
     >
       <TouchableOpacity sym-id="home" className="items-center">
-        <House color="white" size={22} />
-        <Text className="text-white text-xs mt-1">
+        <House sym-id="homeic" color="white" size={22} />
+        <Text  sym-id="hometxt" className="text-white text-xs mt-1">
           Home
         </Text>
       </TouchableOpacity>
@@ -32,8 +32,8 @@ export default function BottomNav() {
       </TouchableOpacity>
 
       <TouchableOpacity sym-id="profile" className="items-center" onPress={()=>{updateRegistry('bottomNav');updateRegistry('app');}}>
-        <User color="white" size={22} />
-        <Text className="text-white text-xs mt-1">
+        <User sym-id="profileic" color="white" size={22} />
+        <Text sym-id="profiletxt" className="text-white text-xs mt-1">
           Profile
         </Text>
       </TouchableOpacity>
