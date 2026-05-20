@@ -18,17 +18,16 @@ export const SymbioticRenderer = ({ symName, tree }: RendererProps) => {
       return <>{node.children.map(childId => renderNode(childId))}</>;
     }
 
-    // --- NEW: Render Static Nodes ---
     if (node.type === 'StaticNode') {
-      // Paint the exact React element from memory, bypassing dynamic reconstruction
       return RuntimeStaticCache.get(node.id); 
     }
-    // --------------------------------
 
-    const Component = RuntimeComponentMap.get(node.type);
+    // THE FIX: Lookup by unique instance ID instead of fragile component names
+    const cacheKey = `${symName}-${node.id}`;
+    const Component = RuntimeComponentMap.get(cacheKey);
     
     if (!Component) {
-      console.warn(`[Symbiotic Renderer] Component ${node.type} not found!`);
+      console.warn(`[Symbiotic Renderer] Missing reference for node ID: ${node.id}`);
       return null;
     }
 
@@ -41,10 +40,8 @@ export const SymbioticRenderer = ({ symName, tree }: RendererProps) => {
       }
     }
 
-   const renderedChildren = node.children.map(childId => renderNode(childId));
+    const renderedChildren = node.children.map(childId => renderNode(childId));
 
-    // If the node has nested sym-id children, render them.
-    // Otherwise, let it self-close so it can use the text from {...node.props}
     if (renderedChildren.length > 0) {
       return (
         <Component key={node.id} {...node.props} {...reattachedFunctions}>
@@ -52,9 +49,7 @@ export const SymbioticRenderer = ({ symName, tree }: RendererProps) => {
         </Component>
       );
     } else {
-      return (
-        <Component key={node.id} {...node.props} {...reattachedFunctions} />
-      );
+      return <Component key={node.id} {...node.props} {...reattachedFunctions} />;
     }
   };
 

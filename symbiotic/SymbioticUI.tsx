@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useRe
 import { SymRegistry, SymbioticContextType, SymTree } from './types';
 import { parseJSXToRegistry } from './parser';
 import { SymbioticRenderer } from './renderer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // 1. The Global Context
 const SymbioticContext = createContext<SymbioticContextType | null>(null);
@@ -12,47 +13,79 @@ const STORAGE_KEY_INITIAL = '@symbiotic_initial_registry';
 export const SymbioticProvider = ({ children }: { children: ReactNode }) => {
   const [registry, setRegistry] = useState<SymRegistry>({});
   const initialRegistryRef = useRef<SymRegistry>({});
+  const latestRegistryRef = useRef<SymRegistry>({});
+  const [isReady, setIsReady] = useState(false); // Prevents rendering before storage loads
 
-  const latestRegistryRef = useRef<SymRegistry>(registry);
   latestRegistryRef.current = registry;
-
   const getRegistry = () => latestRegistryRef.current;
 
-  const registerTree = (symName: string, tree: SymTree) => {
+  // 1. Load from Storage on Mount
+  useEffect(() => {
+    const loadStorage = async () => {
+      try {
+        const savedInitial = await AsyncStorage.getItem(STORAGE_KEY_INITIAL);
+        const savedCurrent = await AsyncStorage.getItem(STORAGE_KEY_CURRENT);
+
+        if (savedInitial) initialRegistryRef.current = JSON.parse(savedInitial);
+        if (savedCurrent) setRegistry(JSON.parse(savedCurrent));
+      } catch (e) {
+        console.error("Failed to load registry from storage", e);
+      } finally {
+        setIsReady(true);
+      }
+    };
+    loadStorage();
+  }, []);
+
+  const registerTree = async (symName: string, tree: SymTree) => {
+    // Only save initial if we don't already have one loaded from storage
+    if (!initialRegistryRef.current[symName]) {
+      initialRegistryRef.current[symName] = tree;
+      console.log(">> Storing initial");
+      
+      await AsyncStorage.setItem(STORAGE_KEY_INITIAL, JSON.stringify(initialRegistryRef.current));
+    }
+
     setRegistry(prev => {
+      // If we already loaded a mutated version from storage, keep it!
+      if (prev[symName]) return prev;
+
+      console.log(">> Storing Prev");
+      
       const newReg = { ...prev, [symName]: tree };
-      initialRegistryRef.current[symName] = tree; // Save initial copy for reset
+      AsyncStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(newReg));
       return newReg;
     });
   };
 
- const updateRegistry = (symName: string, mutatedTree?: SymTree) => {
+  const updateRegistry = async (symName: string, mutatedTree?: SymTree) => {
     if (mutatedTree) {
-      // Apply the LLM's new JSON to trigger a re-render
-      setRegistry(prev => ({
-        ...prev,
-        [symName]: mutatedTree
-      }));
-      console.log(`[Symbiotic] Mutation applied to ${symName}!`);
-    } else {
-      // Fallback: Just log it if no tree is passed
-      console.log(`\n=== No Trees Passed - Current State ===`);
-      console.log(JSON.stringify(registry, null, 2));
-      console.log(`==============================\n`);
+      setRegistry(prev => {
+        const newReg = { ...prev, [symName]: mutatedTree };
+        AsyncStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(newReg)); // Save mutation
+        return newReg;
+      });
+      console.log(`[Symbiotic] Mutation applied and saved for ${symName}!`);
     }
   };
 
-  const resetRegistry = (symName: string) => {
-    if (initialRegistryRef.current[symName]) {
-      setRegistry(prev => ({
-        ...prev,
-        [symName]: initialRegistryRef.current[symName]
-      }));
+  const resetRegistry = async (symName: string) => {
+    const originalTree = initialRegistryRef.current[symName];
+    if (originalTree) {
+      setRegistry(prev => {
+        const newReg = { ...prev, [symName]: originalTree };
+        AsyncStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(newReg)); // Overwrite with original
+        return newReg;
+      });
+      console.log(`[Symbiotic] Reset applied and saved for ${symName}!`);
     }
   };
+
+  // Don't render children until storage is checked, to prevent UI flashing
+  if (!isReady) return null; 
 
   return (
-    <SymbioticContext.Provider value={{ registry, updateRegistry, resetRegistry, registerTree, getRegistry }}>
+    <SymbioticContext.Provider value={{ registry, getRegistry, updateRegistry, resetRegistry, registerTree }}>
       {children}
     </SymbioticContext.Provider>
   );
@@ -72,20 +105,23 @@ interface SymbioticUIProps {
 
 export const SymbioticUI = ({ 'sym-name': symName, children }: SymbioticUIProps) => {
   const { registry, registerTree } = useSymbiotic();
-  const hasParsed = useRef(false);
+  const hasRegistered = useRef(false);
 
+  // 1. Parse synchronously on mount to guarantee Memory Caches are populated 
+  // before the Renderer reads from the AsyncStorage JSON.
+  const parsedTree = useMemo(() => {
+    return parseJSXToRegistry(children, symName);
+  }, [children, symName]);
+
+  // 2. Register the initial tree (Only saves if storage doesn't already have it)
   useEffect(() => {
-    if (!hasParsed.current) {
-      const parsedTree = parseJSXToRegistry(children, symName);
+    if (!hasRegistered.current) {
       registerTree(symName, parsedTree);
-      hasParsed.current = true;
+      hasRegistered.current = true;
     }
-  }, []); // Remove dependencies so it only parses strictly on mount
+  }, []); // Run once on mount
 
   const tree = registry[symName];
-
-  // If tree doesn't exist yet (first tick), render null to avoid flashing.
-  // Once it exists in state, render it from the JSON.
   if (!tree) return null;
 
   return <SymbioticRenderer symName={symName} tree={tree} />;
