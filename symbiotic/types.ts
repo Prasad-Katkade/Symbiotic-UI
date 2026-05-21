@@ -1,5 +1,18 @@
+export type TextSize = 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl';
+export type SpacingSize = '0' | '1' | '2' | '4' | '6' | '8' | '10' | '12'; // Max constraint
+
 export interface DesignTokens {
-  // TODO: Define design token constraints (e.g., bg-color, border-color, text-sizes)
+  bgColor?: string;
+  textColor?: string;
+  showBorder?: boolean;
+  borderColor?: string;
+  textSize?: TextSize;
+  p?: SpacingSize;
+  px?: SpacingSize;
+  py?: SpacingSize;
+  m?: SpacingSize;
+  mx?: SpacingSize;
+  my?: SpacingSize;
 }
 
 export interface SymNode {
@@ -8,7 +21,8 @@ export interface SymNode {
   parent: string | null;
   children: string[];
   props: {
-    designTokens?: DesignTokens;
+    className?: string; 
+    designTokens?: DesignTokens; 
     [key: string]: any;
   };
 }

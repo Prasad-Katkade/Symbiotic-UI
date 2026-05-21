@@ -1,6 +1,7 @@
 import React from 'react';
 import { SymTree, SymNode } from './types';
 import { RuntimeComponentMap, RuntimeFunctionCache, RuntimeStaticCache } from './registry';
+import { sanitizeTokens, tokensToClassName } from './utils';
 
 interface RendererProps {
   symName: string;
@@ -40,16 +41,26 @@ export const SymbioticRenderer = ({ symName, tree }: RendererProps) => {
       }
     }
 
+    // 1. Separate className and designTokens from the rest of the props
+    const { className, designTokens, ...otherProps } = node.props;
+
+    // 2. Compile dynamic classes
+    const safeTokens = sanitizeTokens(designTokens);
+    const dynamicClasses = tokensToClassName(safeTokens);
+
+    // 3. Merge them (Dynamic classes go last to override static ones)
+    const finalClassName = `${className || ''} ${dynamicClasses}`.trim();
+
     const renderedChildren = node.children.map(childId => renderNode(childId));
 
     if (renderedChildren.length > 0) {
       return (
-        <Component key={node.id} {...node.props} {...reattachedFunctions}>
+        <Component key={node.id} className={finalClassName} {...otherProps} {...reattachedFunctions}>
           {renderedChildren}
         </Component>
       );
     } else {
-      return <Component key={node.id} {...node.props} {...reattachedFunctions} />;
+      return <Component key={node.id} className={finalClassName} {...otherProps} {...reattachedFunctions} />;
     }
   };
 

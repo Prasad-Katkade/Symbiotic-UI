@@ -7,4 +7,10 @@ module.exports = {
     extend: {},
   },
   plugins: [],
+ safelist: [
+    { pattern: /(bg|text|border)-(zinc|blue|red|emerald|yellow)-(100|400|500|600|800|900)/ },
+    { pattern: /text-(xs|sm|base|lg|xl|2xl)/ },
+    // NEW: Safelist our constrained spacing utilities
+    { pattern: /^(p|px|py|m|mx|my)-(0|1|2|4|6|8|10|12)$/ }
+  ]
 }

@@ -20,6 +20,13 @@ export default function BottomNav() {
     // 3. The LLM changes the layout order
     mutatedTree.nodes['container'].children = ['search', 'profile', 'fav', 'home'];
 
+    mutatedTree.nodes['profile'].props.designTokens = {
+      bgColor: 'blue-600',
+      showBorder: true,
+      borderColor: 'yellow-400',
+      p:'4',
+    };
+
     // 4. Update the state engine
     updateRegistry('bottomNav', mutatedTree);
   };
