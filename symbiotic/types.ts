@@ -1,5 +1,6 @@
 export type TextSize = 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl';
-export type SpacingSize = '0' | '1' | '2' | '4' | '6' | '8' | '10' | '12'; // Max constraint
+export type SpacingSize = '0' | '1' | '2' | '4' | '6' | '8' | '10' | '12'; 
+export type PositionInset = '0' | '2' | '4' | '8' | 'auto';
 
 export interface DesignTokens {
   bgColor?: string;
@@ -13,6 +14,11 @@ export interface DesignTokens {
   m?: SpacingSize;
   mx?: SpacingSize;
   my?: SpacingSize;
+  position?: 'relative' | 'absolute';
+  top?: PositionInset;
+  bottom?: PositionInset;
+  left?: PositionInset;
+  right?: PositionInset;
 }
 
 export interface SymNode {

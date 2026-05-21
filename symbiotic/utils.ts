@@ -31,20 +31,28 @@ export const tokensToClassName = (tokens?: DesignTokens): string => {
   if (!tokens) return '';
 
   const classes: string[] = [];
-
+  
+  //Design Classes
   if (tokens.bgColor) classes.push(`bg-${tokens.bgColor}`);
   if (tokens.textColor) classes.push(`text-${tokens.textColor}`);
   if (tokens.showBorder) classes.push('border');
   if (tokens.borderColor) classes.push(`border-${tokens.borderColor}`);
   if (tokens.textSize) classes.push(`text-${tokens.textSize}`);
   
-  // NEW: Compile spacing classes
+  // Spacing classes
   if (tokens.p) classes.push(`p-${tokens.p}`);
   if (tokens.px) classes.push(`px-${tokens.px}`);
   if (tokens.py) classes.push(`py-${tokens.py}`);
   if (tokens.m) classes.push(`m-${tokens.m}`);
   if (tokens.mx) classes.push(`mx-${tokens.mx}`);
   if (tokens.my) classes.push(`my-${tokens.my}`);
+
+  //Positions 
+  if (tokens.position) classes.push(tokens.position);
+  if (tokens.top) classes.push(`top-${tokens.top}`);
+  if (tokens.bottom) classes.push(`bottom-${tokens.bottom}`);
+  if (tokens.left) classes.push(`left-${tokens.left}`);
+  if (tokens.right) classes.push(`right-${tokens.right}`);
 
   return classes.join(' ');
 };
