@@ -23,7 +23,10 @@ export default function Header() {
         <Text
           className="text-white text-2xl font-bold"
           onPress={() => {
+            console.log("pressed");
+            
             resetRegistry("bottomNav");
+            resetRegistry("app")
           }}
         >
           test-app

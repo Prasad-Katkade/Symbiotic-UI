@@ -7,17 +7,12 @@ export default function BottomNav() {
 
 
   const mockLLMMutation = () => {
-    // 1. Fetch the absolute latest registry from memory
     const liveRegistry = getRegistry();
-    console.log("current registry for bottomNav", liveRegistry['bottomNav']);
-    
     const currentTree = liveRegistry['bottomNav'];
     if (!currentTree) return;
 
-    // 2. Create a deep copy
     const mutatedTree = JSON.parse(JSON.stringify(currentTree));
 
-    // 3. The LLM changes the layout order
     mutatedTree.nodes['container'].children = ['search', 'profile', 'fav', 'home'];
 
     mutatedTree.nodes['profile'].props.designTokens = {
@@ -26,8 +21,6 @@ export default function BottomNav() {
       borderColor: 'yellow-400',
       p:'4',
     };
-
-    // 4. Update the state engine
     updateRegistry('bottomNav', mutatedTree);
   };
 
@@ -58,7 +51,7 @@ export default function BottomNav() {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity sym-id="profile" className="items-center" onPress={()=>{mockLLMMutation()}}>
+      <TouchableOpacity sym-id="profile" className="items-center" onPress={()=>{}}>
         <User sym-id="profileic" color="white" size={22} />
         <Text sym-id="profiletxt" className="text-white text-xs mt-1">
           Profile

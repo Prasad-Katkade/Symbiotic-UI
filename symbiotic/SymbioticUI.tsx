@@ -1,14 +1,24 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
-import { SymRegistry, SymbioticContextType, SymTree } from './types';
-import { parseJSXToRegistry } from './parser';
-import { SymbioticRenderer } from './renderer';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useRef,
+} from "react";
+import { SymRegistry, SymbioticContextType, SymTree } from "./types";
+import { parseJSXToRegistry } from "./parser";
+import { SymbioticRenderer } from "./renderer";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSettings } from "@/contexts/SettingsContext";
+import { Pressable, View } from "react-native";
+import { useModal } from "@/contexts/ModalContext";
 
 // 1. The Global Context
 const SymbioticContext = createContext<SymbioticContextType | null>(null);
 
-const STORAGE_KEY_CURRENT = '@symbiotic_current_registry';
-const STORAGE_KEY_INITIAL = '@symbiotic_initial_registry';
+const STORAGE_KEY_CURRENT = "@symbiotic_current_registry";
+const STORAGE_KEY_INITIAL = "@symbiotic_initial_registry";
 
 export const SymbioticProvider = ({ children }: { children: ReactNode }) => {
   const [registry, setRegistry] = useState<SymRegistry>({});
@@ -42,16 +52,19 @@ export const SymbioticProvider = ({ children }: { children: ReactNode }) => {
     if (!initialRegistryRef.current[symName]) {
       initialRegistryRef.current[symName] = tree;
       console.log(">> Storing initial");
-      
-      await AsyncStorage.setItem(STORAGE_KEY_INITIAL, JSON.stringify(initialRegistryRef.current));
+
+      await AsyncStorage.setItem(
+        STORAGE_KEY_INITIAL,
+        JSON.stringify(initialRegistryRef.current),
+      );
     }
 
-    setRegistry(prev => {
+    setRegistry((prev) => {
       // If we already loaded a mutated version from storage, keep it!
       if (prev[symName]) return prev;
 
       console.log(">> Storing Prev");
-      
+
       const newReg = { ...prev, [symName]: tree };
       AsyncStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(newReg));
       return newReg;
@@ -60,7 +73,7 @@ export const SymbioticProvider = ({ children }: { children: ReactNode }) => {
 
   const updateRegistry = async (symName: string, mutatedTree?: SymTree) => {
     if (mutatedTree) {
-      setRegistry(prev => {
+      setRegistry((prev) => {
         const newReg = { ...prev, [symName]: mutatedTree };
         AsyncStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(newReg)); // Save mutation
         return newReg;
@@ -72,7 +85,7 @@ export const SymbioticProvider = ({ children }: { children: ReactNode }) => {
   const resetRegistry = async (symName: string) => {
     const originalTree = initialRegistryRef.current[symName];
     if (originalTree) {
-      setRegistry(prev => {
+      setRegistry((prev) => {
         const newReg = { ...prev, [symName]: originalTree };
         AsyncStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(newReg)); // Overwrite with original
         return newReg;
@@ -82,10 +95,18 @@ export const SymbioticProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Don't render children until storage is checked, to prevent UI flashing
-  if (!isReady) return null; 
+  if (!isReady) return null;
 
   return (
-    <SymbioticContext.Provider value={{ registry, getRegistry, updateRegistry, resetRegistry, registerTree }}>
+    <SymbioticContext.Provider
+      value={{
+        registry,
+        getRegistry,
+        updateRegistry,
+        resetRegistry,
+        registerTree,
+      }}
+    >
       {children}
     </SymbioticContext.Provider>
   );
@@ -93,36 +114,52 @@ export const SymbioticProvider = ({ children }: { children: ReactNode }) => {
 
 export const useSymbiotic = () => {
   const context = useContext(SymbioticContext);
-  if (!context) throw new Error("useSymbiotic must be used within a SymbioticProvider");
+  if (!context)
+    throw new Error("useSymbiotic must be used within a SymbioticProvider");
   return context;
 };
 
 // 2. The Local Wrapper Component
 interface SymbioticUIProps {
-  'sym-name': string;
+  "sym-name": string;
   children: ReactNode;
 }
 
-export const SymbioticUI = ({ 'sym-name': symName, children }: SymbioticUIProps) => {
+export const SymbioticUI = ({
+  "sym-name": symName,
+  children,
+}: SymbioticUIProps) => {
   const { registry, registerTree } = useSymbiotic();
   const hasRegistered = useRef(false);
+  const { pageEditingEnabled } = useSettings();
+  const { showModal } = useModal();
 
-  // 1. Parse synchronously on mount to guarantee Memory Caches are populated 
-  // before the Renderer reads from the AsyncStorage JSON.
   const parsedTree = useMemo(() => {
     return parseJSXToRegistry(children, symName);
   }, [children, symName]);
 
-  // 2. Register the initial tree (Only saves if storage doesn't already have it)
   useEffect(() => {
     if (!hasRegistered.current) {
       registerTree(symName, parsedTree);
       hasRegistered.current = true;
     }
-  }, []); // Run once on mount
+  }, []);
 
   const tree = registry[symName];
   if (!tree) return null;
 
-  return <SymbioticRenderer symName={symName} tree={tree} />;
+  // Pass the edit state DOWN to the renderer instead of wrapping it!
+  return (
+    <SymbioticRenderer
+      symName={symName}
+      tree={tree}
+      isEditMode={pageEditingEnabled}
+      onEditClick={() => {
+        console.log("clicked symName:", symName);
+        showModal({
+          layoutName: symName,
+        });
+      }}
+    />
+  );
 };
