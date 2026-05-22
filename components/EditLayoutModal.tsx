@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Modal, View, Text, Pressable, TextInput, ActivityIndicator } from "react-native";
+import {
+  Modal,
+  View,
+  Text,
+  Pressable,
+  TextInput,
+  ActivityIndicator,
+} from "react-native";
 import { X } from "lucide-react-native";
 import { useSymbiotic } from "@/symbiotic/SymbioticUI";
 
@@ -25,7 +32,80 @@ export default function EditLayoutModal({
     onClose();
   };
 
+  const applyOperations = (tree, operations) => {
+    const updated = JSON.parse(JSON.stringify(tree));
+
+    operations.forEach((op) => {
+      switch (op.type) {
+        case "REORDER":
+          updated.nodes[op.parent].children = op.order;
+
+          break;
+
+        case "STYLE":
+          updated.nodes[op.target].props.designTokens = {
+            ...updated.nodes[op.target].props.designTokens,
+
+            ...op.designTokens,
+          };
+
+          break;
+      }
+    });
+
+    return updated;
+  };
+
   const applyLLMMutation = async () => {
+    const liveRegistry = getRegistry();
+
+    const currentTree = liveRegistry[layoutName];
+
+    if (!currentTree || !value.trim()) return;
+
+    try {
+      setIsMutating(true);
+
+      const response = await fetch(
+        "http://192.168.86.248:3000/partial_mutate",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify({
+            prompt: value,
+            tree: currentTree,
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(`API Error:`);
+      }
+
+      const result = await response.json();
+
+      console.log("operations == ", JSON.stringify(result, null, 2));
+
+      const mutatedTree = applyOperations(currentTree, result.operations || []);
+
+      console.log("Updated Layout == \n", JSON.stringify(mutatedTree));
+      
+
+      updateRegistry(layoutName, mutatedTree);
+
+      console.log("[Symbiotic] Applied operations");
+    } catch (error) {
+      console.error("[Symbiotic] Failed:", error);
+    } finally {
+      handleClose();
+    }
+  };
+
+  const applyLLMMutationFull = async () => {
     const liveRegistry = getRegistry();
     const currentTree = liveRegistry[layoutName];
 
@@ -75,10 +155,11 @@ export default function EditLayoutModal({
     >
       <View className="flex-1 bg-black/70 items-center justify-center px-5">
         <View className="w-full bg-zinc-900 rounded-3xl border border-zinc-800 p-5">
-          
           {/* Header */}
           <View className="flex-row items-center justify-between">
-            <Text className="text-white text-2xl font-bold">Edit {layoutName}</Text>
+            <Text className="text-white text-2xl font-bold">
+              Edit {layoutName}
+            </Text>
             {/* Hide the close button while mutating to prevent interrupting the flow */}
             {!isMutating && (
               <Pressable onPress={handleClose}>
@@ -98,7 +179,8 @@ export default function EditLayoutModal({
           ) : (
             <>
               <Text className="text-zinc-400 mt-4 leading-6">
-                Describe how you want to change this layout. You can move elements, change colors, or adjust spacing.
+                Describe how you want to change this layout. You can move
+                elements, change colors, or adjust spacing.
               </Text>
 
               <TextInput
@@ -121,7 +203,6 @@ export default function EditLayoutModal({
               </Pressable>
             </>
           )}
-
         </View>
       </View>
     </Modal>
