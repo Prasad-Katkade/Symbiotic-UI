@@ -1,5 +1,5 @@
 import { useSymbiotic } from "@/symbiotic/SymbioticUI";
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, Image } from "react-native";
 import { useRouter } from "expo-router";
 import { Plus, Settings } from "lucide-react-native";
 
@@ -8,9 +8,8 @@ export default function Header() {
   const router = useRouter();
 
   return (
-    <View className="w-full bg-black px-5 py-4 border-b border-zinc-800">
+    <View className="w-full bg-black px-5 py-4 border-b ">
       <View className="flex-row items-center justify-between">
-        {/* Left */}
         <Pressable
           onPress={() => {
             console.log("Plus pressed");
@@ -19,8 +18,14 @@ export default function Header() {
           <Plus color="white" size={24} />
         </Pressable>
 
-        {/* Center */}
-        <Text
+  
+        <Image
+          source={require("../assets/images/instalogo.png")}
+          className="w-32 h-12"
+          resizeMode="contain"
+          style={{ tintColor: "white" }} // Forces the logo to be white
+        />
+        {/* <Text
           className="text-white text-2xl font-bold"
           onPress={() => {
             console.log("pressed");
@@ -30,9 +35,8 @@ export default function Header() {
           }}
         >
           test-app
-        </Text>
+        </Text> */}
 
-        {/* Right */}
         <Pressable
           onPress={() => {
             router.push("/settings");

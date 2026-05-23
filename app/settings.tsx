@@ -11,7 +11,7 @@ import { ArrowLeft } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { useSettings } from "@/contexts/SettingsContext";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -37,7 +37,7 @@ export default function SettingsScreen() {
       </View>
 
       {/* Content */}
-      <View className="flex-1 bg-black px-5 py-6">
+      <View className="flex-1 bg-black px-5 py-6 gap-2">
         <View className="flex-row items-center justify-between border border-zinc-800 rounded-2xl px-4 py-4">
           <View>
             <Text className="text-white text-lg font-semibold">
@@ -57,13 +57,13 @@ export default function SettingsScreen() {
             }}
           />
         </View>
-        <View className="flex-row items-center justify-between border border-zinc-800 rounded-2xl px-4 py-4">
-          <TouchableOpacity
-            onPress={async () => {
-              await AsyncStorage.clear();
-              console.log("Storage cleared! Reload the app.");
-            }}
-          >
+        <TouchableOpacity
+          onPress={async () => {
+            await AsyncStorage.clear();
+            console.log("Storage cleared! Reload the app.");
+          }}
+        >
+          <View className="flex-row items-center justify-between border border-zinc-800 rounded-2xl px-4 py-4">
             <View>
               <Text className="text-white text-lg font-semibold">
                 Reset Storage
@@ -71,8 +71,8 @@ export default function SettingsScreen() {
 
               <Text className="text-zinc-400 mt-1">Relod the app</Text>
             </View>
-          </TouchableOpacity>
-        </View>
+          </View>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

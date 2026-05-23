@@ -1,63 +1,80 @@
-import { View, Text, TouchableOpacity } from "react-native";
-import { House, Search, Heart, User } from "lucide-react-native";
-import {SymbioticUI, useSymbiotic} from "@/symbiotic/SymbioticUI";
+import { View, Text, TouchableOpacity, Image } from "react-native";
+import {
+  House,
+  Search,
+  Heart,
+  User,
+  SquarePlay,
+  Send,
+} from "lucide-react-native";
+import { SymbioticUI, useSymbiotic } from "@/symbiotic/SymbioticUI";
+import { useRouter } from "expo-router";
 
 export default function BottomNav() {
   const { getRegistry, updateRegistry } = useSymbiotic();
-
+  const router = useRouter();
 
   const mockLLMMutation = () => {
     const liveRegistry = getRegistry();
-    const currentTree = liveRegistry['bottomNav'];
+    const currentTree = liveRegistry["bottomNav"];
     if (!currentTree) return;
 
     const mutatedTree = JSON.parse(JSON.stringify(currentTree));
 
-    mutatedTree.nodes['container'].children = ['search', 'profile', 'fav', 'home'];
+    mutatedTree.nodes["container"].children = [
+      "search",
+      "profile",
+      "fav",
+      "home",
+    ];
 
-    mutatedTree.nodes['profile'].props.designTokens = {
-      bgColor: 'blue-600',
+    mutatedTree.nodes["profile"].props.designTokens = {
+      bgColor: "blue-600",
       showBorder: true,
-      borderColor: 'yellow-400',
-      p:'4',
+      borderColor: "yellow-400",
+      p: "4",
     };
-    updateRegistry('bottomNav', mutatedTree);
+    updateRegistry("bottomNav", mutatedTree);
   };
 
   return (
-  <SymbioticUI sym-name="bottomNav">
+    // <SymbioticUI sym-name="bottomNav">
     <View
       sym-id="container"
-      className="flex-row justify-around items-center bg-zinc-900 border-t border-zinc-800 py-3"
+      className="flex-row justify-around items-center  py-3"
     >
       <TouchableOpacity sym-id="home" className="items-center">
-        <House sym-id="homeic" color="white" size={22} />
-        <Text  sym-id="hometxt" className="text-white text-xs mt-1">
-          Home
-        </Text>
+        <House sym-id="homeic" color="white" size={28} />
+      </TouchableOpacity>
+
+      <TouchableOpacity sym-id="reels" className="items-center">
+        <SquarePlay sym-id="reelsic" color="white" size={28} />
+      </TouchableOpacity>
+
+      <TouchableOpacity sym-id="msgs" className="items-center">
+        <Send color="white" size={28} />
       </TouchableOpacity>
 
       <TouchableOpacity sym-id="search" className="items-center">
-        <Search color="white" size={22} />
-        <Text className="text-white text-xs mt-1">
-          Search
-        </Text>
+        <Search color="white" size={28} />
       </TouchableOpacity>
 
-      <TouchableOpacity sym-id="fav" className="items-center">
-        <Heart color="white" size={22} />
-        <Text className="text-white text-xs mt-1">
-          Favorites
-        </Text>
+      <TouchableOpacity
+        sym-id="profile"
+        className="items-center"
+        onPress={() => {
+          router.push("/profile");
+        }}
+      >
+        <Image
+          source={{
+            uri: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&dpr=2&q=80",
+          }}
+          className="w-8 h-8 rounded-full"
+          resizeMode="cover"
+        />
       </TouchableOpacity>
-
-      <TouchableOpacity sym-id="profile" className="items-center" onPress={()=>{}}>
-        <User sym-id="profileic" color="white" size={22} />
-        <Text sym-id="profiletxt" className="text-white text-xs mt-1">
-          Profile
-        </Text>
-      </TouchableOpacity>
-    </View></SymbioticUI>  
-    
+    </View>
+      // </SymbioticUI>
   );
 }

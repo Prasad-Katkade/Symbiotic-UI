@@ -4,31 +4,51 @@ import CardItem from "./CardItem";
 const cards = [
   {
     id: 1,
-    title: "Mountain View",
-    description: "Beautiful mountain landscape in dark theme.",
-    image:
-      "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+    username: "jess.codes",
+    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+    likes: 1243,
+    caption:
+      "Minimalist workspace vibes for the weekend. ☕️ #design #setup",
+    comments: 84,
+    send: 29,
+    repost: 11,
+    time: "2 hours ago",
   },
   {
     id: 2,
-    title: "City Lights",
-    description: "Night city lights with modern aesthetic.",
-    image:
-      "https://images.unsplash.com/photo-1494526585095-c41746248156",
+    username: "michaeltravels",
+    image: "https://images.unsplash.com/photo-1494526585095-c41746248156",
+    likes: 892,
+    caption:
+      "Tiny corners that make a house feel like home 🏡✨ #interiors",
+    comments: 41,
+    send: 17,
+    repost: 6,
+    time: "5 hours ago",
   },
   {
     id: 3,
-    title: "Forest Path",
-    description: "Peaceful forest walking path.",
-    image:
-      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e",
+    username: "wildlens",
+    image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e",
+    likes: 3245,
+    caption:
+      "Lost in the woods and honestly not complaining 🌲🍃 #nature",
+    comments: 132,
+    send: 58,
+    repost: 24,
+    time: "1 day ago",
   },
   {
     id: 4,
-    title: "Ocean Breeze",
-    description: "Relaxing ocean and sunset vibes.",
-    image:
-      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+    username: "oceanpixels",
+    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+    likes: 2789,
+    caption:
+      "Sunsets hit different when the waves sound this good 🌊☀️",
+    comments: 96,
+    send: 44,
+    repost: 19,
+    time: "3 days ago",
   },
 ];
 
@@ -37,7 +57,7 @@ export default function Body() {
     <ScrollView
       className="flex-1 bg-black"
       contentContainerStyle={{
-        padding: 16,
+        padding: 0,
         paddingBottom: 100,
       }}
       showsVerticalScrollIndicator={false}
@@ -46,9 +66,14 @@ export default function Body() {
         {cards.map((card) => (
           <CardItem
             key={card.id}
-            title={card.title}
-            description={card.description}
+            username={card.username}
+            likes={card.likes}
+            caption={card.caption}
+            comments={card.comments}
+            time={card.time}
             image={card.image}
+            send={card.send}
+            repost={card.repost}
           />
         ))}
       </View>
