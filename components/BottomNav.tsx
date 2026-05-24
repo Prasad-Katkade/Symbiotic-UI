@@ -8,11 +8,12 @@ import {
   Send,
 } from "lucide-react-native";
 import { SymbioticUI, useSymbiotic } from "@/symbiotic/SymbioticUI";
-import { useRouter } from "expo-router";
+import { usePathname, useRouter } from "expo-router";
 
 export default function BottomNav() {
   const { getRegistry, updateRegistry } = useSymbiotic();
   const router = useRouter();
+  const pathname = usePathname();
 
   const mockLLMMutation = () => {
     const liveRegistry = getRegistry();
@@ -43,11 +44,15 @@ export default function BottomNav() {
       sym-id="container"
       className="flex-row justify-around items-center  py-3"
     >
-      <TouchableOpacity sym-id="home" className="items-center">
+      <TouchableOpacity sym-id="home" className="items-center" onPress={() => {
+           if (pathname!=="/") router.push("/");
+        }}>
         <House sym-id="homeic" color="white" size={28} />
       </TouchableOpacity>
 
-      <TouchableOpacity sym-id="reels" className="items-center">
+      <TouchableOpacity sym-id="reels" className="items-center"  onPress={() => {
+           if (pathname!=="/reels") router.push("/reels");
+        }}>
         <SquarePlay sym-id="reelsic" color="white" size={28} />
       </TouchableOpacity>
 
@@ -63,7 +68,7 @@ export default function BottomNav() {
         sym-id="profile"
         className="items-center"
         onPress={() => {
-          router.push("/profile");
+          if (pathname!=="/profile") router.push("/profile");
         }}
       >
         <Image
