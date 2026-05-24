@@ -5,6 +5,7 @@ import React, {
   useEffect,
   ReactNode,
   useRef,
+  useMemo,
 } from "react";
 import { SymRegistry, SymbioticContextType, SymTree } from "./types";
 import { parseJSXToRegistry } from "./parser";
@@ -13,6 +14,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSettings } from "@/contexts/SettingsContext";
 import { Pressable, View } from "react-native";
 import { useModal } from "@/contexts/ModalContext";
+import { mergeTrees } from "./utils";
 
 // 1. The Global Context
 const SymbioticContext = createContext<SymbioticContextType | null>(null);
@@ -134,25 +136,29 @@ export const SymbioticUI = ({
   const { pageEditingEnabled } = useSettings();
   const { showModal } = useModal();
 
+  const freshTree = useMemo(() => {
+    return parseJSXToRegistry(children, symName);
+  }, [children, symName]);
+
   const parsedTree = useMemo(() => {
     return parseJSXToRegistry(children, symName);
   }, [children, symName]);
 
   useEffect(() => {
-    if (!hasRegistered.current) {
-      registerTree(symName, parsedTree);
+    if (!hasRegistered.current && !registry[symName]) {
+      registerTree(symName, freshTree);
       hasRegistered.current = true;
     }
-  }, []);
+  }, [symName, freshTree, registry]); // Added registry to deps
 
-  const tree = registry[symName];
-  if (!tree) return null;
+  const savedTree = registry[symName];
+  const activeTree = savedTree ? mergeTrees(freshTree, savedTree) : freshTree;
 
   // Pass the edit state DOWN to the renderer instead of wrapping it!
   return (
     <SymbioticRenderer
       symName={symName}
-      tree={tree}
+      tree={activeTree}
       isEditMode={pageEditingEnabled}
       onEditClick={() => {
         console.log("clicked symName:", symName);

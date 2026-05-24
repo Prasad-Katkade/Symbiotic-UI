@@ -27,7 +27,11 @@ export const SymbioticRenderer = ({ symName, tree, isEditMode, onEditClick }: Re
     }
 
     if (node.type === 'StaticNode') {
-      return RuntimeStaticCache.get(node.id); 
+      const staticElement = RuntimeStaticCache.get(node.id);
+      // Clone the element to safely inject a unique key so React forces the update
+      return React.isValidElement(staticElement) 
+        ? React.cloneElement(staticElement as React.ReactElement, { key: node.id }) 
+        : staticElement;
     }
 
     const cacheKey = `${symName}-${node.id}`;

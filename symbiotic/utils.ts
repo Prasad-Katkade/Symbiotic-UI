@@ -1,4 +1,4 @@
-import { DesignTokens, TextSize, SpacingSize } from './types';
+import { DesignTokens, TextSize, SpacingSize, SymTree, SymNode } from './types';
 
 export const sanitizeTokens = (tokens?: DesignTokens): DesignTokens => {
   if (!tokens) return {};
@@ -56,3 +56,39 @@ export const tokensToClassName = (tokens?: DesignTokens): string => {
 
   return classes.join(' ');
 };
+
+export const mergeTrees = (freshTree: SymTree, savedTree: SymTree): SymTree => {
+  const mergedNodes: Record<string, SymNode> = {};
+
+  for (const nodeId in freshTree.nodes) {
+    const freshNode = freshTree.nodes[nodeId];
+    const savedNode = savedTree.nodes[nodeId];
+
+    if (savedNode) {
+      // 1. Array Reconciliation
+      // Keep LLM's order, but filter out nodes that React just deleted via state
+      let mergedChildren = savedNode.children.filter(id => freshNode.children.includes(id));
+      
+      // Find any NEW nodes React just dynamically rendered that the LLM doesn't know about yet
+      const newChildren = freshNode.children.filter(id => !savedNode.children.includes(id));
+      
+      // Combine them
+      mergedChildren = [...mergedChildren, ...newChildren];
+
+      mergedNodes[nodeId] = {
+        ...freshNode,
+        children: mergedChildren, // <-- Use our smartly merged array
+        props: {
+          ...freshNode.props,         
+          className: savedNode.props.className, 
+          designTokens: savedNode.props.designTokens 
+        }
+      };
+    } else {
+      mergedNodes[nodeId] = freshNode;
+    }
+  }
+
+  return { root: freshTree.root, nodes: mergedNodes };
+};
+

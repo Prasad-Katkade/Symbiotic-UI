@@ -38,7 +38,7 @@ export default function BottomNav() {
   };
 
   return (
-    // <SymbioticUI sym-name="bottomNav">
+    <SymbioticUI sym-name="bottomNav">
     <View
       sym-id="container"
       className="flex-row justify-around items-center  py-3"
@@ -75,6 +75,6 @@ export default function BottomNav() {
         />
       </TouchableOpacity>
     </View>
-      // </SymbioticUI>
+    </SymbioticUI>
   );
 }
