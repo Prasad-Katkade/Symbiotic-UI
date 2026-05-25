@@ -50,6 +50,42 @@ export default function EditLayoutModal({
           };
 
           break;
+
+        case "HIDE": {
+          const node = updated.nodes[op.target];
+
+          if (!node) return;
+
+          node.props.hidden = true;
+
+          console.log("\nupdating node==\n",node);
+          
+
+          break;
+        }
+
+        case "SHOW": {
+          const node = updated.nodes[op.target];
+
+          if (!node) return;
+
+          node.props.hidden = false;
+
+          break;
+        }
+
+        case "PATCH_TEXT": {
+          const node = updated.nodes[op.target];
+
+          if (!node) return;
+
+          node.props.children = op.text;
+
+          break;
+        }
+
+        default:
+          console.warn("[Symbiotic] Unknown operation:", op.type);
       }
     });
 
@@ -93,7 +129,6 @@ export default function EditLayoutModal({
       const mutatedTree = applyOperations(currentTree, result.operations || []);
 
       console.log("Updated Layout == \n", JSON.stringify(mutatedTree));
-      
 
       updateRegistry(layoutName, mutatedTree);
 
@@ -134,9 +169,14 @@ export default function EditLayoutModal({
 
       if (mutatedTree && mutatedTree.root && mutatedTree.nodes) {
         updateRegistry(layoutName, mutatedTree);
-        console.log(`[Symbiotic] Mutation successfully applied to ${layoutName}!`);
+        console.log(
+          `[Symbiotic] Mutation successfully applied to ${layoutName}!`,
+        );
       } else {
-        console.error("[Symbiotic] Invalid tree structure returned from API:", mutatedTree);
+        console.error(
+          "[Symbiotic] Invalid tree structure returned from API:",
+          mutatedTree,
+        );
       }
     } catch (error) {
       console.error("[Symbiotic] Failed to fetch mutation:", error);

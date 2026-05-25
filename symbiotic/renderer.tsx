@@ -4,6 +4,7 @@ import { SymTree, SymNode } from './types';
 import { RuntimeComponentMap, RuntimeFunctionCache, RuntimeStaticCache } from './registry';
 import { sanitizeTokens, tokensToClassName } from './utils';
 import { useSymbiotic } from './SymbioticUI';
+import { Pencil } from 'lucide-react-native';
 
 interface RendererProps {
   symName: string;
@@ -78,24 +79,31 @@ export const SymbioticRenderer = ({ symName, tree, isEditMode, onEditClick }: Re
              resetRegistry(symName)
             }}
           >
-            <Text className="text-white text-[10px] font-bold">Reset</Text>
+            <Text className="text-white text-[10px] font-bold"> X </Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
            
-            className="bg-blue-600 px-2 py-1 rounded-bl-lg shadow-md"
+            className="bg-blue-600 p-1 rounded-bl-lg shadow-md"
             onPress={(e) => {
               e.stopPropagation(); // Stop the click from bubbling!
               onEditClick(symName);
             }}
           >
-            <Text className="text-white text-[10px] font-bold">Edit {symName}</Text>
+            {/* <Text className="text-white text-[10px] font-bold">Edit {symName}</Text> */}
+             <Pencil color="white" size={24} />
           </TouchableOpacity>
 
           </View>
 
         </Component>
       );
+    }
+  
+    if(node.id==="friends-header")console.log(node);
+    
+    if (node.props?.hidden) {
+      return null;
     }
 
     // Normal rendering

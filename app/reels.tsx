@@ -100,7 +100,7 @@ export default function Reels() {
           </View>
 
           <View className="flex-row items-center gap-4" sym-id="friends">
-            <Text className="text-white text-2xl font-bold opacity-50">
+            <Text sym-id="friends-header" className="text-white text-2xl font-bold opacity-50">
               Friends
             </Text>
             <Image

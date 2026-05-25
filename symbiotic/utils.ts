@@ -81,7 +81,11 @@ export const mergeTrees = (freshTree: SymTree, savedTree: SymTree): SymTree => {
         props: {
           ...freshNode.props,         
           className: savedNode.props.className, 
-          designTokens: savedNode.props.designTokens 
+          designTokens: savedNode.props.designTokens ,
+          hidden: savedNode.props.hidden,
+          ...(typeof savedNode.props.children === 'string' || typeof savedNode.props.children === 'number'
+            ? { children: savedNode.props.children } 
+            : {})
         }
       };
     } else {

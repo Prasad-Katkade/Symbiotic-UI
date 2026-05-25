@@ -29,6 +29,7 @@ export interface SymNode {
   props: {
     className?: string; 
     designTokens?: DesignTokens; 
+    hidden?:boolean;
     [key: string]: any;
   };
 }
