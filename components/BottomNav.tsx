@@ -11,32 +11,32 @@ import { SymbioticUI, useSymbiotic } from "@/symbiotic/SymbioticUI";
 import { usePathname, useRouter } from "expo-router";
 
 export default function BottomNav() {
-  const { getRegistry, updateRegistry } = useSymbiotic();
+  const { getTreeForLLM, addOperations } = useSymbiotic();
   const router = useRouter();
   const pathname = usePathname();
 
-  const mockLLMMutation = () => {
-    const liveRegistry = getRegistry();
-    const currentTree = liveRegistry["bottomNav"];
-    if (!currentTree) return;
+  // const mockLLMMutation = () => {
+  //   const liveRegistry = getRegistry();
+  //   const currentTree = liveRegistry["bottomNav"];
+  //   if (!currentTree) return;
 
-    const mutatedTree = JSON.parse(JSON.stringify(currentTree));
+  //   const mutatedTree = JSON.parse(JSON.stringify(currentTree));
 
-    mutatedTree.nodes["container"].children = [
-      "search",
-      "profile",
-      "fav",
-      "home",
-    ];
+  //   mutatedTree.nodes["container"].children = [
+  //     "search",
+  //     "profile",
+  //     "fav",
+  //     "home",
+  //   ];
 
-    mutatedTree.nodes["profile"].props.designTokens = {
-      bgColor: "blue-600",
-      showBorder: true,
-      borderColor: "yellow-400",
-      p: "4",
-    };
-    updateRegistry("bottomNav", mutatedTree);
-  };
+  //   mutatedTree.nodes["profile"].props.designTokens = {
+  //     bgColor: "blue-600",
+  //     showBorder: true,
+  //     borderColor: "yellow-400",
+  //     p: "4",
+  //   };
+  //   updateRegistry("bottomNav", mutatedTree);
+  // };
 
   return (
     <SymbioticUI sym-name="bottomNav">

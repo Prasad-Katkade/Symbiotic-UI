@@ -4,7 +4,7 @@ export default function Stories() {
   const DUMMY_STORIES = [
     {
       id: "me",
-      username: "Your Story",
+      username: "You",
       img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&dpr=2&q=80",
       isUser: true,
     },

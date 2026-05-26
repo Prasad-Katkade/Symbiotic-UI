@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import { Plus, Settings } from "lucide-react-native";
 
 export default function Header() {
-  const { resetRegistry } = useSymbiotic();
+  const { resetOperations } = useSymbiotic();
   const router = useRouter();
 
   return (

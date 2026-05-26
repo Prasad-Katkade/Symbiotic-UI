@@ -57,42 +57,41 @@ export const tokensToClassName = (tokens?: DesignTokens): string => {
   return classes.join(' ');
 };
 
-export const mergeTrees = (freshTree: SymTree, savedTree: SymTree): SymTree => {
-  const mergedNodes: Record<string, SymNode> = {};
+export const applyOperations = (tree: SymTree, operations: any[] = []): SymTree => {
+  if (!operations || operations.length === 0) return tree;
 
-  for (const nodeId in freshTree.nodes) {
-    const freshNode = freshTree.nodes[nodeId];
-    const savedNode = savedTree.nodes[nodeId];
+  // Deep clone to protect React's original state
+  const updated = JSON.parse(JSON.stringify(tree));
 
-    if (savedNode) {
-      // 1. Array Reconciliation
-      // Keep LLM's order, but filter out nodes that React just deleted via state
-      let mergedChildren = savedNode.children.filter(id => freshNode.children.includes(id));
-      
-      // Find any NEW nodes React just dynamically rendered that the LLM doesn't know about yet
-      const newChildren = freshNode.children.filter(id => !savedNode.children.includes(id));
-      
-      // Combine them
-      mergedChildren = [...mergedChildren, ...newChildren];
-
-      mergedNodes[nodeId] = {
-        ...freshNode,
-        children: mergedChildren, // <-- Use our smartly merged array
-        props: {
-          ...freshNode.props,         
-          className: savedNode.props.className, 
-          designTokens: savedNode.props.designTokens ,
-          hidden: savedNode.props.hidden,
-          ...(typeof savedNode.props.children === 'string' || typeof savedNode.props.children === 'number'
-            ? { children: savedNode.props.children } 
-            : {})
+  operations.forEach((op) => {
+    switch (op.type) {
+      case "REORDER":
+        if (updated.nodes[op.parent]) {
+          updated.nodes[op.parent].children = op.order;
         }
-      };
-    } else {
-      mergedNodes[nodeId] = freshNode;
+        break;
+      case "STYLE":
+        if (updated.nodes[op.target]) {
+          updated.nodes[op.target].props.designTokens = {
+            ...updated.nodes[op.target].props.designTokens,
+            ...op.designTokens,
+          };
+        }
+        break;
+      case "HIDE":
+        if (updated.nodes[op.target]) updated.nodes[op.target].props.hidden = true;
+        break;
+      case "SHOW":
+        if (updated.nodes[op.target]) updated.nodes[op.target].props.hidden = false;
+        break;
+      case "PATCH_TEXT":
+        if (updated.nodes[op.target]) updated.nodes[op.target].props.children = op.text;
+        break;
+      default:
+        console.warn("[Symbiotic] Unknown operation:", op.type);
     }
-  }
+  });
 
-  return { root: freshTree.root, nodes: mergedNodes };
+  return updated;
 };
 

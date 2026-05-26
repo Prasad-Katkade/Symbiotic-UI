@@ -4,7 +4,7 @@ import { SymTree, SymNode } from './types';
 import { RuntimeComponentMap, RuntimeFunctionCache, RuntimeStaticCache } from './registry';
 import { sanitizeTokens, tokensToClassName } from './utils';
 import { useSymbiotic } from './SymbioticUI';
-import { Pencil } from 'lucide-react-native';
+import { Pencil, RefreshCcw } from 'lucide-react-native';
 
 interface RendererProps {
   symName: string;
@@ -19,7 +19,7 @@ export const SymbioticRenderer = ({ symName, tree, isEditMode, onEditClick }: Re
   // Added `isTopLevel` parameter to track the outer-most component
   const renderNode = (nodeId: string, isTopLevel = false): React.ReactNode => {
     const node: SymNode = tree.nodes[nodeId];
-    const { resetRegistry } = useSymbiotic();
+    const { resetOperations } = useSymbiotic();
     if (!node) return null;
 
     if (node.type === 'Root') {
@@ -76,10 +76,11 @@ export const SymbioticRenderer = ({ symName, tree, isEditMode, onEditClick }: Re
             className="bg-blue-600 px-2 py-1 rounded-bl-lg shadow-md"
             onPress={(e) => {
               e.stopPropagation(); // Stop the click from bubbling!
-             resetRegistry(symName)
+             resetOperations(symName)
             }}
           >
-            <Text className="text-white text-[10px] font-bold"> X </Text>
+            {/* <Text className="text-white text-[10px] font-bold"> X </Text> */}
+              <RefreshCcw color="white" size={24} />
           </TouchableOpacity>
           
           <TouchableOpacity 

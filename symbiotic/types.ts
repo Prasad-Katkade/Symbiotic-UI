@@ -42,9 +42,12 @@ export interface SymTree {
 export type SymRegistry = Record<string, SymTree>;
 
 export interface SymbioticContextType {
-  registry: SymRegistry;
-  getRegistry: () => SymRegistry; // NEW
-  updateRegistry: (symName: string, mutatedTree?: SymTree) => void; // Modified for Step 4 testing
-  resetRegistry: (symName: string) => void;
-  registerTree: (symName: string, tree: SymTree) => void;
+  // 1. The State & Refs
+  operationsMap: Record<string, any[]>;
+  activeTreesRef: React.MutableRefObject<Record<string, SymTree>>;
+  
+  // 2. The Methods
+  getTreeForLLM: (symName: string) => SymTree | null;
+  addOperations: (symName: string, ops: any[]) => void;
+  resetOperations: (symName: string) => void;
 }
