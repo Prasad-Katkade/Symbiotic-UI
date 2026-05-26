@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { X } from "lucide-react-native";
 import { useSymbiotic } from "@/symbiotic/SymbioticUI";
+import Toast from "react-native-toast-message";
 
 type Props = {
   visible: boolean;
@@ -58,9 +59,6 @@ export default function EditLayoutModal({
 
           node.props.hidden = true;
 
-          console.log("\nupdating node==\n",node);
-          
-
           break;
         }
 
@@ -101,27 +99,37 @@ export default function EditLayoutModal({
     try {
       setIsMutating(true);
 
-      const response = await fetch("http://192.168.86.248:3000/partial_mutate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: value, tree: currentTree }),
-      });
+      const response = await fetch(
+        "http://192.168.86.248:3000/partial_mutate",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: value, tree: currentTree }),
+        },
+      );
 
       if (!response.ok) throw new Error(`API Error`);
 
       const result = await response.json();
       const newOps = result.operations || [];
 
-      // 2. Save the operations. 
+      console.log("newOps", newOps, newOps.length);
+      if (newOps.length <= 0) {
+        setIsMutating(false);
+        return;
+      }
+
+      // 2. Save the operations.
       // The wrapper component will instantly detect this and re-render the activeTree!
       addOperations(layoutName, newOps);
 
-      console.log(`[Symbiotic] Applied ${newOps.length} operations successfully.`);
+      console.log(
+        `[Symbiotic] Applied ${newOps.length} operations successfully.`,
+      );
+      handleClose();
     } catch (error) {
       console.error("[Symbiotic] Failed:", error);
-    } finally {
-      handleClose();
-    }
+    } 
   };
 
   // const applyLLMMutationOld = async () => {
@@ -230,7 +238,7 @@ export default function EditLayoutModal({
           {/* Header */}
           <View className="flex-row items-center justify-between">
             <Text className="text-white text-2xl font-bold">
-              {isMutating ?"Editing":"Edit"} {layoutName}
+              {isMutating ? "Editing" : "Edit"} {layoutName}
             </Text>
             {/* Hide the close button while mutating to prevent interrupting the flow */}
             {!isMutating && (

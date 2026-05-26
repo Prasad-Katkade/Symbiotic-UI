@@ -101,8 +101,6 @@ export const SymbioticRenderer = ({ symName, tree, isEditMode, onEditClick }: Re
       );
     }
   
-    if(node.id==="friends-header")console.log(node);
-    
     if (node.props?.hidden) {
       return null;
     }

@@ -75,7 +75,6 @@ export default function CardItem({
               sym-id="like"
               className="flex flex-row items-center gap-2"
               onPress={() => {
-                console.log("pressed heart");
                 setHeartSelected(!heartSelected);
               }}
             >
@@ -130,7 +129,6 @@ export default function CardItem({
             <TouchableOpacity
               sym-id="bookmark"
               onPress={() => {
-                console.log("pressed bookmark");
                 setBookmarkSelected(!bookmarkSelected);
               }}
             >

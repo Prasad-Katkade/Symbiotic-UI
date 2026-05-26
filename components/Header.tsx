@@ -12,7 +12,6 @@ export default function Header() {
       <View className="flex-row items-center justify-between">
         <Pressable
           onPress={() => {
-            console.log("Plus pressed");
           }}
         >
           <Plus color="white" size={24} />

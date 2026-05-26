@@ -21,11 +21,6 @@ export default function FloatingActionButton() {
      activeOpacity={0.8}
       onPress={() => {
         setPageEditingEnabled(!pageEditingEnabled);
-
-        console.log(
-          "Page Editing:",
-          !pageEditingEnabled
-        );
       }}
       style={{
         bottom: insets.bottom + 100,
