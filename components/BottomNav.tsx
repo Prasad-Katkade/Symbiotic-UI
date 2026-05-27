@@ -15,33 +15,10 @@ export default function BottomNav() {
   const router = useRouter();
   const pathname = usePathname();
 
-  // const mockLLMMutation = () => {
-  //   const liveRegistry = getRegistry();
-  //   const currentTree = liveRegistry["bottomNav"];
-  //   if (!currentTree) return;
-
-  //   const mutatedTree = JSON.parse(JSON.stringify(currentTree));
-
-  //   mutatedTree.nodes["container"].children = [
-  //     "search",
-  //     "profile",
-  //     "fav",
-  //     "home",
-  //   ];
-
-  //   mutatedTree.nodes["profile"].props.designTokens = {
-  //     bgColor: "blue-600",
-  //     showBorder: true,
-  //     borderColor: "yellow-400",
-  //     p: "4",
-  //   };
-  //   updateRegistry("bottomNav", mutatedTree);
-  // };
-
   return (
-    <SymbioticUI sym-name="bottomNav">
+    <SymbioticUI sym-name="bottom-nav">
     <View
-      sym-id="container"
+      sym-id="bottom-nav-container"
       className="flex-row justify-around items-center  py-3"
     >
       <TouchableOpacity sym-id="home" className="items-center" onPress={() => {

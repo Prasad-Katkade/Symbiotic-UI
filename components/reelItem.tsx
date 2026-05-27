@@ -1,9 +1,13 @@
-// ReelItem.tsx
 import React, { useRef, useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import { Video, ResizeMode } from "expo-av";
-import MarqueeText from "react-native-marquee";
-import { Bookmark, Heart, MessageCircle, Repeat2, Send } from "lucide-react-native";
+import {
+  Bookmark,
+  Heart,
+  MessageCircle,
+  Repeat2,
+  Send,
+} from "lucide-react-native";
 import { SymbioticUI } from "@/symbiotic/SymbioticUI";
 
 export default function ReelItem({ item, isActive, height }: any) {
@@ -18,7 +22,7 @@ export default function ReelItem({ item, isActive, height }: any) {
     } else {
       // Resets video to beginning when user scrolls past it
       videoRef.current.pauseAsync();
-      videoRef.current.setPositionAsync(0); 
+      videoRef.current.setPositionAsync(0);
     }
   }, [isActive]);
 
@@ -49,40 +53,44 @@ export default function ReelItem({ item, isActive, height }: any) {
 
       {/* RIGHT ACTIONS - Adjusted bottom spacing */}
       <SymbioticUI sym-name="reels-action-btn">
-      <View sym-id="actionbtncontainer" className="absolute right-4 bottom-44 items-center gap-6">
-        <TouchableOpacity
-        sym-id="heart"
-          className="items-center gap-2"
-          onPress={() => setHeartSelected(!heartSelected)}
+        <View
+          sym-id="actionbtncontainer"
+          className="absolute right-4 bottom-44 items-center gap-6"
         >
-          <Heart
-            size={30}
-            fill={heartSelected ? "red" : "transparent"}
-            color={heartSelected ? "red" : "white"}
-          />
-          <Text className="text-white font-bold">{item.likes}</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            sym-id="heart"
+            className="items-center gap-2"
+            onPress={() => setHeartSelected(!heartSelected)}
+          >
+            <Heart
+              size={30}
+              fill={heartSelected ? "red" : "transparent"}
+              color={heartSelected ? "red" : "white"}
+            />
+            <Text className="text-white font-bold">{item.likes}</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity sym-id="comments" className="items-center gap-2">
-          <MessageCircle color="white" size={30} />
-          <Text className="text-white font-bold">{item.comments}</Text>
-        </TouchableOpacity>
+          <TouchableOpacity sym-id="comments" className="items-center gap-2">
+            <MessageCircle color="white" size={30} />
+            <Text className="text-white font-bold">{item.comments}</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity sym-id="repost" className="items-center gap-2">
-          <Repeat2 color="white" size={30} />
-          <Text className="text-white font-bold">{item.repost}</Text>
-        </TouchableOpacity>
+          <TouchableOpacity sym-id="repost" className="items-center gap-2">
+            <Repeat2 color="white" size={30} />
+            <Text className="text-white font-bold">{item.repost}</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity sym-id="send" className="items-center gap-2">
-          <Send color="white" size={30} />
-          <Text className="text-white font-bold">{item.send}</Text>
-        </TouchableOpacity>
+          <TouchableOpacity sym-id="send" className="items-center gap-2">
+            <Send color="white" size={30} />
+            <Text className="text-white font-bold">{item.send}</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity sym-id="bookmark" className="items-center gap-2">
-          <Bookmark color="white" size={30} />
-          <Text className="text-white font-bold">{item.send}</Text>
-        </TouchableOpacity>
-      </View></SymbioticUI>
+          <TouchableOpacity sym-id="bookmark" className="items-center gap-2">
+            <Bookmark color="white" size={30} />
+            <Text className="text-white font-bold">{item.send}</Text>
+          </TouchableOpacity>
+        </View>
+      </SymbioticUI>
 
       {/* BOTTOM INFO - Adjusted bottom spacing */}
       <View className="absolute bottom-12 left-4 right-20">
@@ -100,19 +108,7 @@ export default function ReelItem({ item, isActive, height }: any) {
                 {item.username}
               </Text>
 
-              <MarqueeText
-                style={{
-                  color: "white",
-                  marginTop: 4,
-                  fontSize: 13,
-                }}
-               
-                loop
-                marqueeOnStart
-               
-              >
-                {item.song}
-              </MarqueeText>
+              <Text className="text-white text-sm">{item.song}</Text>
             </View>
           </View>
 

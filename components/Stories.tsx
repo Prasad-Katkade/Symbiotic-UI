@@ -4,6 +4,60 @@ import { Image, ScrollView, Text, View } from "react-native";
 type stroyProps = {
   usedInSend: boolean;
 };
+
+const StoryItem = ({
+  item,
+  usedInSend,
+}: {
+  item: any;
+  usedInSend: boolean;
+}) => {
+  return (
+    <SymbioticUI sym-name="stories">
+      <View className="items-center mr-4 space-y-1" sym-id="stories-container">
+        <View sym-id="profile-container">
+          {usedInSend && (
+            <Text
+              sym-id="popup-msg"
+              className={`${item.isUser ? "text-gray-400" : "text-white"} text-xs bg-gray-800 p-2 rounded-2xl font-normal truncate max-w-[70px]`}
+            >
+              {item.message}
+            </Text>
+          )}
+          <View
+            sym-id="profile"
+            className={`p-[3px] rounded-full ${item.isUser || usedInSend ? "" : "bg-gradient-to-tr from-yellow-500 to-pink-500 border-2 border-pink-500"}`}
+          >
+            <View
+              sym-id="profile-img-container"
+              className="p-[2px] bg-black rounded-full"
+            >
+              <Image
+                sym-id="profile-img"
+                source={{ uri: item.img }}
+                className="w-16 h-16 rounded-full"
+                resizeMode="cover"
+              />
+            </View>
+            {item.isUser && !usedInSend && (
+              <View className="absolute bottom-0 right-0 bg-blue-500 rounded-full w-6 h-6 justify-center items-center border-2 border-black">
+                <Text className="text-white font-bold text-lg leading-4">
+                  +
+                </Text>
+              </View>
+            )}
+          </View>
+        </View>
+        <Text
+          sym-id="username"
+          className="text-white text-xs font-normal truncate max-w-[70px]"
+        >
+          {item.username}
+        </Text>
+      </View>
+    </SymbioticUI>
+  );
+};
 export default function Stories({ usedInSend }: stroyProps) {
   const DUMMY_STORIES = [
     {
@@ -68,74 +122,35 @@ export default function Stories({ usedInSend }: stroyProps) {
     },
   ];
 
-  const StoryItem = ({ item }: { item: any }) => {
-    return (
-      <View className="items-center mr-4 space-y-1" sym-id="stories-container">
-        <View sym-id="profile-container">
-          {usedInSend && (
-            <Text
-              sym-id="popup-msg"
-              className={`${item.isUser ? "text-gray-400" : "text-white"} text-xs bg-gray-800 p-2 rounded-2xl font-normal truncate max-w-[70px]`}
-            >
-              {item.message}
-            </Text>
-          )}
-          <View
-            sym-id="profile"
-            className={`p-[3px] rounded-full ${item.isUser || usedInSend ? "" : "bg-gradient-to-tr from-yellow-500 to-pink-500 border-2 border-pink-500"}`}
-          >
-            <View
-              sym-id="profile-img"
-              className="p-[2px] bg-black rounded-full"
-            >
-              <Image
-                source={{ uri: item.img }}
-                className="w-16 h-16 rounded-full"
-                resizeMode="cover"
-              />
-            </View>
-            {item.isUser && !usedInSend && (
-              <View className="absolute bottom-0 right-0 bg-blue-500 rounded-full w-6 h-6 justify-center items-center border-2 border-black">
-                <Text className="text-white font-bold text-lg leading-4">
-                  +
-                </Text>
-              </View>
-            )}
-          </View>
-        </View>
-        <Text
-          sym-id="username"
-          className="text-white text-xs font-normal truncate max-w-[70px]"
-        >
-          {item.username}
-        </Text>
-      </View>
-    );
-  };
-
   return (
     <View className="py-2 ">
-      <SymbioticUI sym-name="stories">
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          className="pl-4"
-        >
-          {usedInSend ? (
-            <>
-              {DUMMY_STORIES_IN_SEND.map((story) => {
-                return <StoryItem key={story.id} item={story} />;
-              })}
-            </>
-          ) : (
-            <>
-              {DUMMY_STORIES.map((story) => {
-                return <StoryItem key={story.id} item={story} />;
-              })}
-            </>
-          )}
-        </ScrollView>{" "}
-      </SymbioticUI>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        className="pl-4"
+      >
+        {usedInSend ? (
+          <>
+            {DUMMY_STORIES_IN_SEND.map((story) => {
+              return (
+                <StoryItem
+                  key={story.id}
+                  item={story}
+                  usedInSend={usedInSend}
+                />
+              );
+            })}
+          </>
+        ) : (
+          <>
+            {DUMMY_STORIES.map((story) => {
+              return (
+                <StoryItem key={story.id} item={story} usedInSend={false} />
+              );
+            })}
+          </>
+        )}
+      </ScrollView>
     </View>
   );
 }

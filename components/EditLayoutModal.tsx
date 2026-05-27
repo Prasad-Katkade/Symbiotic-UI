@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import { X } from "lucide-react-native";
 import { useSymbiotic } from "@/symbiotic/SymbioticUI";
-import Toast from "react-native-toast-message";
 import { useSettings } from "@/contexts/SettingsContext";
 
 type Props = {
@@ -35,63 +34,6 @@ export default function EditLayoutModal({
     onClose();
   };
 
-  const applyOperations = (tree, operations) => {
-    const updated = JSON.parse(JSON.stringify(tree));
-
-    operations.forEach((op) => {
-      switch (op.type) {
-        case "REORDER":
-          updated.nodes[op.parent].children = op.order;
-
-          break;
-
-        case "STYLE":
-          updated.nodes[op.target].props.designTokens = {
-            ...updated.nodes[op.target].props.designTokens,
-
-            ...op.designTokens,
-          };
-
-          break;
-
-        case "HIDE": {
-          const node = updated.nodes[op.target];
-
-          if (!node) return;
-
-          node.props.hidden = true;
-          
-
-          break;
-        }
-
-        case "SHOW": {
-          const node = updated.nodes[op.target];
-
-          if (!node) return;
-
-          node.props.hidden = false;
-
-          break;
-        }
-
-        case "PATCH_TEXT": {
-          const node = updated.nodes[op.target];
-
-          if (!node) return;
-
-          node.props.children = op.text;
-
-          break;
-        }
-
-        default:
-          console.warn("[Symbiotic] Unknown operation:", op.type);
-      }
-    });
-
-    return updated;
-  };
 
   const applyLLMMutation = async () => {
     // 1. Fetch the exact visual layout the user is currently looking at
@@ -137,100 +79,6 @@ export default function EditLayoutModal({
       console.error("[Symbiotic] Failed:", error);
     } 
   };
-
-  // const applyLLMMutationOld = async () => {
-  //   const liveRegistry = getRegistry();
-
-  //   const currentTree = liveRegistry[layoutName];
-
-  //   if (!currentTree || !value.trim()) return;
-
-  //   try {
-  //     setIsMutating(true);
-
-  //     const response = await fetch(
-  //       "http://192.168.86.248:3000/partial_mutate",
-  //       {
-  //         method: "POST",
-
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-
-  //         body: JSON.stringify({
-  //           prompt: value,
-  //           tree: currentTree,
-  //         }),
-  //       },
-  //     );
-
-  //     if (!response.ok) {
-  //       throw new Error(`API Error:`);
-  //     }
-
-  //     const result = await response.json();
-
-  //     console.log("operations == ", JSON.stringify(result, null, 2));
-
-  //     const mutatedTree = applyOperations(currentTree, result.operations || []);
-
-  //     console.log("Updated Layout == \n", JSON.stringify(mutatedTree));
-
-  //     updateRegistry(layoutName, mutatedTree);
-
-  //     console.log("[Symbiotic] Applied operations");
-  //   } catch (error) {
-  //     console.error("[Symbiotic] Failed:", error);
-  //   } finally {
-  //     handleClose();
-  //   }
-  // };
-
-  // const applyLLMMutationFull = async () => {
-  //   const liveRegistry = getRegistry();
-  //   const currentTree = liveRegistry[layoutName];
-
-  //   if (!currentTree || !value.trim()) return;
-
-  //   try {
-  //     // 1. Trigger loading state
-  //     setIsMutating(true);
-
-  //     const response = await fetch("http://192.168.86.248:3000/mutate", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         prompt: value,
-  //         tree: currentTree,
-  //       }),
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error(`API returned status: ${response.status}`);
-  //     }
-
-  //     const mutatedTree = await response.json();
-
-  //     if (mutatedTree && mutatedTree.root && mutatedTree.nodes) {
-  //       updateRegistry(layoutName, mutatedTree);
-  //       console.log(
-  //         `[Symbiotic] Mutation successfully applied to ${layoutName}!`,
-  //       );
-  //     } else {
-  //       console.error(
-  //         "[Symbiotic] Invalid tree structure returned from API:",
-  //         mutatedTree,
-  //       );
-  //     }
-  //   } catch (error) {
-  //     console.error("[Symbiotic] Failed to fetch mutation:", error);
-  //   } finally {
-  //     // 2. Clean up and close modal
-  //     handleClose();
-  //   }
-  // };
 
   return (
     <Modal

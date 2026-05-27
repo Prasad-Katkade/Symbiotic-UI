@@ -66,7 +66,7 @@ export default function SettingsScreen() {
           <View className="flex-row items-center justify-between border border-zinc-800 rounded-2xl px-4 py-4">
             <View>
               <Text className="text-white text-lg font-semibold">
-                Reset Storage
+                Reset All Changes
               </Text>
 
               <Text className="text-zinc-400 mt-1">Relod the app</Text>

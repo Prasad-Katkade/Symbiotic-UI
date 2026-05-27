@@ -6,8 +6,6 @@ import Header from "../components/Header";
 import Body from "../components/Body";
 import BottomNav from "../components/BottomNav";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { SymbioticUI } from "@/symbiotic/SymbioticUI";
-import { useSettings } from "@/contexts/SettingsContext";
 import Stories from "@/components/Stories";
 
 
@@ -28,7 +26,7 @@ export default function Index() {
         >
           <Header sym-id="Header" />
 
-          <Stories sym-id="Stories"/>
+          <Stories sym-id="Stories" usedInSend={false}/>
 
           <Body sym-id="Body" />
 

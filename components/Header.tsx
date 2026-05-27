@@ -1,10 +1,8 @@
-import { useSymbiotic } from "@/symbiotic/SymbioticUI";
-import { View, Text, Pressable, Image } from "react-native";
+import { View, Pressable, Image } from "react-native";
 import { useRouter } from "expo-router";
 import { Plus, Settings } from "lucide-react-native";
 
 export default function Header() {
-  const { resetOperations } = useSymbiotic();
   const router = useRouter();
 
   return (
@@ -24,18 +22,6 @@ export default function Header() {
           resizeMode="contain"
           style={{ tintColor: "white" }} // Forces the logo to be white
         />
-        {/* <Text
-          className="text-white text-2xl font-bold"
-          onPress={() => {
-            console.log("pressed");
-            
-            resetRegistry("bottomNav");
-            resetRegistry("app")
-          }}
-        >
-          test-app
-        </Text> */}
-
         <Pressable
           onPress={() => {
             router.push("/settings");

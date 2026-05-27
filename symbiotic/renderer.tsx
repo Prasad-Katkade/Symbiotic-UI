@@ -76,6 +76,25 @@ const OverlayTools = ({ symName, onEditClick, resetOperations, node }: any) => {
           onPress={(e) => {
             e.stopPropagation();
             resetOperations(symName);
+            Alert.alert(
+            `Reset Changes for ${symName}` ,
+            "This will remove all the changes that you made.",
+            [
+              {
+                text: "Cancel",
+                onPress: () => {
+                  console.log("Cancel Pressed");
+                },
+                style: "cancel",
+              },
+              {
+                text: "Confirm",
+                onPress: () => {
+                  resetOperations(symName);
+                },
+              },
+            ],
+          );
           }}
         >
           <RefreshCcw color="white" size={20} />
