@@ -78,7 +78,7 @@ export const SymbioticUI = ({ "sym-name": symName, children }: { "sym-name": str
   const { operationsMap, activeTreesRef } = useSymbiotic();
   const { pageEditingEnabled } = useSettings();
   const { showModal } = useModal();
-  const { resetOperations } = useSymbiotic();
+  const { addOperations,resetOperations } = useSymbiotic();
 
   const freshTree = useMemo(() => parseJSXToRegistry(children, symName), [children, symName]);
 
@@ -100,6 +100,7 @@ export const SymbioticUI = ({ "sym-name": symName, children }: { "sym-name": str
       tree={activeTree}
       isEditMode={pageEditingEnabled}
       resetOperations={(symname:string)=>{resetOperations(symname)}}
+      addOperations={(symname:string,newOps:any[])=>{addOperations(symname,newOps)}}
       onEditClick={() => {
         showModal({ layoutName: symName });
       }}
