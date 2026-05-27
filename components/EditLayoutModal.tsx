@@ -10,6 +10,7 @@ import {
 import { X } from "lucide-react-native";
 import { useSymbiotic } from "@/symbiotic/SymbioticUI";
 import Toast from "react-native-toast-message";
+import { useSettings } from "@/contexts/SettingsContext";
 
 type Props = {
   visible: boolean;
@@ -25,11 +26,12 @@ export default function EditLayoutModal({
   const [value, setValue] = useState("");
   const [isMutating, setIsMutating] = useState(false);
   const { getTreeForLLM, addOperations } = useSymbiotic();
+  const {setPageEditingEnabled}=useSettings()
 
   const handleClose = () => {
-    // Reset state when closing so it's fresh next time
     setValue("");
     setIsMutating(false);
+    setPageEditingEnabled(false);
     onClose();
   };
 
@@ -58,6 +60,7 @@ export default function EditLayoutModal({
           if (!node) return;
 
           node.props.hidden = true;
+          
 
           break;
         }
@@ -111,9 +114,12 @@ export default function EditLayoutModal({
       if (!response.ok) throw new Error(`API Error`);
 
       const result = await response.json();
+
+      console.log("Operation", JSON.stringify(result));
+
       const newOps = result.operations || [];
 
-      console.log("newOps", newOps, newOps.length);
+      
       if (newOps.length <= 0) {
         setIsMutating(false);
         return;
@@ -253,7 +259,7 @@ export default function EditLayoutModal({
             <View className="items-center justify-center py-12">
               <ActivityIndicator size="large" color="#f87171" />
               <Text className="text-zinc-400 mt-5 font-medium text-base">
-                Adapting to your needs and updating the UI...
+                Updating the UI...
               </Text>
             </View>
           ) : (

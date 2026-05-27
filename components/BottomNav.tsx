@@ -56,7 +56,9 @@ export default function BottomNav() {
         <SquarePlay sym-id="reelsic" color="white" size={28} />
       </TouchableOpacity>
 
-      <TouchableOpacity sym-id="msgs" className="items-center">
+      <TouchableOpacity  sym-id="msgs" className="items-center"  onPress={() => {
+          if (pathname!=="/messages") router.push("/messages");
+        }}>
         <Send color="white" size={28} />
       </TouchableOpacity>
 
